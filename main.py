@@ -1,12 +1,13 @@
 import os
 import random
-from datetime import timedelta
+from datetime import datetime, timedelta
 from re import search, sub
 
 import discord
 import pymongo
 from discord.ext import commands, tasks
 from discord.utils import get
+from pytz import timezone
 
 from config import *
 from util import *
@@ -20,7 +21,7 @@ intents = discord.Intents.default()
 intents.members = True
 
 # Bot client
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='>', intents=intents)
 
 # Refreshes the sheets' commands and triggers
 def refreshBot():
@@ -102,7 +103,7 @@ async def credits(ctx):
 
     await reactToMessage(bot, ctx.message, ['🤙', '🍉', '😁', '💜', '👋'])
 
-    response = await ctx.reply("Esse bot foi desenvolvido pelo Flip em um momento de tédio. Obrigado pelo interesse <3 \nGitHub: https://github.com/lucasvianav. \nRepositório no GitHub: https://github.com/sa-sel/discord-bot-VII-RPG.")
+    response = await ctx.reply("Esse bot foi desenvolvido pelo Flip em um dia difícil. Obrigado pelo interesse <3 \nGitHub: https://github.com/lucasvianav. \nRepositório no GitHub: https://github.com/sa-sel/discord-bot-VII-RPG.")
     print("   [**] The response was successfully sent.")
     await reactToResponse(bot, response)
 
@@ -171,8 +172,13 @@ async def periodicRefresh():
     print("   [**] The commands and triggers were successfully updated", end="")
     print(" - none registered.") if isEmpty else print(".")
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=1)
 async def handleRoles():
+    now = datetime.now(timezone('America/Sao_Paulo'))
+    if now.hour >= 15: return
+
+    print("\n [*] Checking roles...")
+
     role_names = [ f'Mesa {i}' for i in range(1,9) ]
 
     reactions_dict = {
@@ -192,6 +198,8 @@ async def handleRoles():
     reactions_message = await intructions_channel.fetch_message(DISCORD_MESSAGE)
     roles = [ role for role in await server.fetch_roles() if role.name in role_names ]
 
+    print("   [**] Fetched message...")
+
     reactions = [ reaction for reaction in reactions_message.reactions if reaction.me ]
 
     for reaction in reactions:
@@ -204,10 +212,13 @@ async def handleRoles():
                 for r in previousRole: await user.remove_roles(r)
             await user.add_roles(role)
 
+    print("   [**] Managed roles...")
 
     # clear all reactions and add'em again
     await reactions_message.clear_reactions()
     await reactToMessage(bot, reactions_message, list(reactions_dict.keys()))
+
+    print("   [**] Cleared reactions...")
 
 
 if __name__ == '__main__':
