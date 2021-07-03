@@ -176,8 +176,8 @@ def user_dice_counter(db, id, incNat1: bool = False, incNat20: bool = False):
 
     if not (incNat1 or incNat20): return user
 
-    if incNat1: user.nat1 += 1
-    if incNat20: user.nat20 += 1
+    if incNat1: user["nat1"] += 1
+    if incNat20: user["nat20"] += 1
 
     db.find_one_and_update({ "discord_id": user.discord_id },
                            { "$set": {
@@ -186,3 +186,4 @@ def user_dice_counter(db, id, incNat1: bool = False, incNat20: bool = False):
                            } })
 
     return user
+
