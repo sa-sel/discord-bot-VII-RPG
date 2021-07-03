@@ -16,7 +16,8 @@ class Decisions(commands.Cog):
     # rolls a dice
     @commands.command(
         brief='">roll N dX" vai jogar n dado com X lados.',
-        help='Vai jogar N dados com número de lados igual ao número passado. e.g. ">roll 3 20" vai jogar três dado com 20 lados.'
+        help='Vai jogar N dados com número de lados igual ao número passado. e.g. ">roll 3 20" vai jogar três dado com 20 lados.',
+        aliases=[ 'rolar' ]
     )
     async def roll(self, ctx, qty, number):
         await ctx.trigger_typing()
@@ -63,7 +64,7 @@ class Decisions(commands.Cog):
     @commands.command(
         brief='">d N" vai jogar dois dado com N lados e retornar o maior resultado.',
         help='Vai jogar jogar dado com número de lados igual ao número passado e retorar o maior resultado. e.g. ">advatage 20" vai jogar dois dado com 20 lados.',
-        aliases='vantagem'
+        aliases=[ 'vantagem' ]
     )
     async def advantage(self, ctx, number):
         await ctx.trigger_typing()
@@ -84,7 +85,7 @@ class Decisions(commands.Cog):
     @commands.command(
         brief='">d N" vai jogar dois dado com N lados e retornar o menor resultado.',
         help='Vai jogar jogar dado com número de lados igual ao número passado e retorar o menor resultado. e.g. ">advatage 20" vai jogar dois dado com 20 lados.',
-        aliases='desvantagem'
+        aliases=[ 'desvantagem' ]
     )
     async def disadvantage(self, ctx, number):
         await ctx.trigger_typing()
