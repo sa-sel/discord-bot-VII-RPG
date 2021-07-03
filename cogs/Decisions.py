@@ -17,8 +17,7 @@ class Decisions(commands.Cog):
 
         # Database
         client = pymongo.MongoClient(MONGODB_ATLAS_URI)
-        self.db = client['discord-bot-vii-rpg']['discord-bot-vii-rpg']
-        self.counters = self.db.find_one({"description": "counters"})['counters']
+        self.db = client['discord-bot-vii-rpg']['users']
 
     def getUserData(self, id):
         user = self.db.find_one({"discord_id": id})

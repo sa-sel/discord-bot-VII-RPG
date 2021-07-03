@@ -19,7 +19,7 @@ class Counters(commands.Cog):
         client = pymongo.MongoClient(MONGODB_ATLAS_URI)
         self.db = client['discord-bot-vii-rpg']['users']
 
-    @commands.command(brief='', help='', aliases=[])
+    @commands.command(brief='Adiciona mais um Natural 1 na sua contagem.', help='', aliases=[])
     async def addNat1(self, ctx):
         await ctx.trigger_typing()
 
@@ -33,7 +33,7 @@ class Counters(commands.Cog):
 
         await reactToResponse(self.bot, response, [':one:'])
 
-    @commands.command(brief='', help='', aliases=[])
+    @commands.command(brief='Adiciona mais um Natural 20 na sua contagem.', help='', aliases=[])
     async def addNat20(self, ctx):
         await ctx.trigger_typing()
 
@@ -47,7 +47,7 @@ class Counters(commands.Cog):
 
         await reactToResponse(self.bot, response, [':two:', ':zero:'])
 
-    @commands.command(brief='', help='', aliases=[])
+    @commands.command(brief='Fala quantos Natural 1s você tirou.', help='', aliases=[])
     async def nat1(self, ctx):
         await ctx.trigger_typing()
 
@@ -61,7 +61,7 @@ class Counters(commands.Cog):
 
         await reactToResponse(self.bot, response, [':one:'])
 
-    @commands.command(brief='', help='', aliases=[])
+    @commands.command(brief='Fala quantos Natural 20s você tirou.', help='', aliases=[])
     async def nat20(self, ctx):
         await ctx.trigger_typing()
 
@@ -75,7 +75,7 @@ class Counters(commands.Cog):
 
         await reactToResponse(self.bot, response, [':one:'])
 
-    @commands.command(brief='', help='', aliases=[])
+    @commands.command(brief='Mostra o ranking de Natural 1s e 20s.', help='', aliases=[])
     async def ranking(self, ctx):
         await ctx.trigger_typing()
 
