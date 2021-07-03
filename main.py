@@ -102,7 +102,7 @@ async def credits(ctx):
 
     await reactToMessage(bot, ctx.message, ['🤙', '🍉', '😁', '💜', '👋'])
 
-    response = await ctx.reply("Esse bot foi desenvolvido pelo Flip em um momento de tédio. Obrigado pelo interesse <3 \nGitHub: https://github.com/lucasvianav. \nRepositório no GitHub: https://github.com/lucasvianav/discord-chatbot.")
+    response = await ctx.reply("Esse bot foi desenvolvido pelo Flip em um momento de tédio. Obrigado pelo interesse <3 \nGitHub: https://github.com/lucasvianav. \nRepositório no GitHub: https://github.com/sa-sel/discord-bot-VII-RPG.")
     print("   [**] The response was successfully sent.")
     await reactToResponse(bot, response)
 
@@ -170,6 +170,44 @@ async def periodicRefresh():
 
     print("   [**] The commands and triggers were successfully updated", end="")
     print(" - none registered.") if isEmpty else print(".")
+
+@tasks.loop(minutes=5)
+async def handleRoles():
+    role_names = [ f'Mesa {i}' for i in range(1,9) ]
+
+    reactions_dict = {
+        ':one:':   1,
+        ':two:':   2,
+        ':three:': 3,
+        ':four:':  4,
+        ':five:':  5,
+        ':six:':   6,
+        ':seven:': 7,
+        ':eight:': 8
+    }
+
+    # fetches discord message and roles
+    server = await bot.fetch_guild(DISCORD_SERVER)
+    intructions_channel = server.get_channel(DISCORD_CHANNEL)
+    reactions_message = await intructions_channel.fetch_message(DISCORD_MESSAGE)
+    roles = [ role for role in await server.fetch_roles() if role.name in role_names ]
+
+    reactions = [ reaction for reaction in reactions_message.reactions if reaction.me ]
+
+    for reaction in reactions:
+        role = get(roles, name=reactions_dict[reaction.name])
+        reactors = [ await server.fetch_member(user.id) for user in await reaction.users().flatten() if not user.bot ]
+
+        for user in reactors:
+            previousRole = [ r for r in user.roles if r.name in role_names ]
+            if previousRole:
+                for r in previousRole: await user.remove_roles(r)
+            await user.add_roles(role)
+
+
+    # clear all reactions and add'em again
+    await reactions_message.clear_reactions()
+    await reactToMessage(bot, reactions_message, list(reactions_dict.keys()))
 
 
 if __name__ == '__main__':

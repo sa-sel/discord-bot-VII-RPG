@@ -1,4 +1,6 @@
 import random
+# import pymongo
+# from config import MONGODB_ATLAS_URI
 from asyncio import sleep
 from re import search
 
@@ -12,6 +14,11 @@ from util import *
 class Decisions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+        # Database
+        client = pymongo.MongoClient(MONGODB_ATLAS_URI)
+        self.db = client['discord-bot-vii-rpg']['discord-bot-vii-rpg']
+        self.counters = self.db.find_one({"description": "counters"})['counters']
 
     # rolls a dice
     @commands.command(

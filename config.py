@@ -11,11 +11,17 @@ if os.path.isfile('./.env'):
     DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
     SPREADSHEET_KEY = os.getenv('SPREADSHEET_KEY')
     MONGODB_ATLAS_URI = os.getenv('MONGODB_ATLAS_URI')
+    DISCORD_SERVER = os.getenv('DISCORD_SERVER')
+    DISCORD_MESSAGE = os.getenv('DISCORD_MESSAGE')
+    DISCORD_CHANNEL = os.getenv('DISCORD_CHANNEL')
 
 else:
     DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
     SPREADSHEET_KEY = os.environ['SPREADSHEET_KEY']
     MONGODB_ATLAS_URI = os.environ['MONGODB_ATLAS_URI']
+    DISCORD_SERVER = os.environ['DISCORD_SERVER']
+    DISCORD_MESSAGE = os.environ['DISCORD_MESSAGE']
+    DISCORD_CHANNEL = os.environ['DISCORD_CHANNEL']
 
 # if no credential is found, search for it as enviromental variables
 if not os.path.isfile('./credentials.json'):
