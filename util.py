@@ -166,3 +166,23 @@ def refreshCogs(bot, cogSheet: list, hasLoaded=True):
             bot.load_extension(f'cogs.{filename.replace(".py","")}')
 
     return
+
+def user_dice_counter(db, id, incNat1: bool = False, incNat20: bool = False):
+    user = db.find_one({"discord_id": id})
+
+    if not user:
+        db.insert_one({ 'discord_id': id, 'nat20': 0, 'nat1': 0 }).inserted_id
+        user = db.find_one({"discord_id": id})
+
+    if not (incNat1 or incNat20): return user
+
+    if incNat1: user.nat1 += 1
+    if incNat20: user.nat20 += 1
+
+    db.find_one_and_update({ "discord_id": user.discord_id },
+                           { "$set": {
+                               "nat1": user.nat1,
+                               "nat20": user.nat20
+                           } })
+
+    return user

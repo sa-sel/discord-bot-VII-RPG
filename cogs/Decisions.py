@@ -1,13 +1,13 @@
 import random
-# import pymongo
-# from config import MONGODB_ATLAS_URI
 from asyncio import sleep
 from re import search
 
+import pymongo
 from discord.ext import commands
 from discord.utils import get
 
 from config import *
+from config import MONGODB_ATLAS_URI
 from util import *
 
 
@@ -19,6 +19,15 @@ class Decisions(commands.Cog):
         client = pymongo.MongoClient(MONGODB_ATLAS_URI)
         self.db = client['discord-bot-vii-rpg']['discord-bot-vii-rpg']
         self.counters = self.db.find_one({"description": "counters"})['counters']
+
+    def getUserData(self, id):
+        user = self.db.find_one({"discord_id": id})
+
+        if not user:
+            self.db.insert_one({ 'discord_id': id, 'nat20': 0, 'nat1': 0 }).inserted_id
+            user = self.db.find_one({"discord_id": id})
+
+        return user
 
     # rolls a dice
     @commands.command(
@@ -63,6 +72,10 @@ class Decisions(commands.Cog):
 
         output = random.randint(1, number)
 
+        if number == 20 and output in ( 1, 20 ):
+            user_dice_counter(self.db, ctx.author.id, incNat1=(output == 1), incNat20=(output == 20))
+            output = f'**NATURAL {output}**'
+
         response = await ctx.reply(output)
 
         await reactToResponse(self.bot, response)
@@ -84,6 +97,10 @@ class Decisions(commands.Cog):
 
         output = max(random.randint(1, number), random.randint(1, number))
 
+        if number == 20 and output in ( 1, 20 ):
+            user_dice_counter(self.db, ctx.author.id, incNat1=(output == 1), incNat20=(output == 20))
+            output = f'**NATURAL {output}**'
+
         response = await ctx.reply(output)
 
         await reactToResponse(self.bot, response)
@@ -104,6 +121,10 @@ class Decisions(commands.Cog):
         await reactToMessage(self.bot, ctx.message, ['❔'])
 
         output = min(random.randint(1, number), random.randint(1, number))
+
+        if number == 20 and output in ( 1, 20 ):
+            user_dice_counter(self.db, ctx.author.id, incNat1=(output == 1), incNat20=(output == 20))
+            output = f'**NATURAL {output}**'
 
         response = await ctx.reply(output)
 
