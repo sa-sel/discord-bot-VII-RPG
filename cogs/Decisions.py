@@ -2,9 +2,10 @@ import random
 from asyncio import sleep
 from re import search
 
-from config import *
 from discord.ext import commands
 from discord.utils import get
+
+from config import *
 from util import *
 
 
@@ -14,7 +15,33 @@ class Decisions(commands.Cog):
 
     # rolls a dice
     @commands.command(
-        brief='">d N" vai jogar um dado com N lados.', 
+        brief='">roll N dX" vai jogar n dado com X lados.',
+        help='Vai jogar N dados com número de lados igual ao número passado. e.g. ">roll 3 20" vai jogar três dado com 20 lados.'
+    )
+    async def roll(self, ctx, qty, number):
+        await ctx.trigger_typing()
+
+        if not search(r'd\d*', number):
+            output = 'Comando inválido. Envie `>help roll`.'
+
+        else:
+            qty = abs(int(qty))
+            number = abs(int(number.replace('d','')))
+
+            print(f'\n [*] \'>roll {qty} d{number}\' command called.')
+
+            await reactToMessage(self.bot, ctx.message, ['❔'])
+
+            dice_rolls = [ random.randint(1, number) for _ in range(qty) ]
+            output = ", ".join([ str(roll) for roll in dice_rolls ]) + f'\n**TOTAL**: {sum(dice_rolls)}'
+
+        response = await ctx.reply(output)
+
+        await reactToResponse(self.bot, response)
+
+    # rolls a dice
+    @commands.command(
+        brief='">d N" vai jogar um dado com N lados.',
         help='Vai jogar um dado com número de lados igual ao número passado. e.g. ">d 20" vai jogar um dado com 20 lados.'
     )
     async def d(self, ctx, number):
@@ -26,7 +53,49 @@ class Decisions(commands.Cog):
 
         await reactToMessage(self.bot, ctx.message, ['❔'])
 
-        output = random.choice(['cara', 'coroa']) if number == 2 else random.randint(1, number)
+        output = random.randint(1, number)
+
+        response = await ctx.reply(output)
+
+        await reactToResponse(self.bot, response)
+
+    # rolls a dice with advantage
+    @commands.command(
+        brief='">d N" vai jogar dois dado com N lados e retornar o maior resultado.',
+        help='Vai jogar jogar dado com número de lados igual ao número passado e retorar o maior resultado. e.g. ">advatage 20" vai jogar dois dado com 20 lados.',
+        aliases='vantagem'
+    )
+    async def advantage(self, ctx, number):
+        await ctx.trigger_typing()
+
+        number = abs(int(number))
+
+        print(f'\n [*] \'>d{number}\' command called.')
+
+        await reactToMessage(self.bot, ctx.message, ['❔'])
+
+        output = max(random.randint(1, number), random.randint(1, number))
+
+        response = await ctx.reply(output)
+
+        await reactToResponse(self.bot, response)
+
+    # rolls a dice with disadvantage
+    @commands.command(
+        brief='">d N" vai jogar dois dado com N lados e retornar o menor resultado.',
+        help='Vai jogar jogar dado com número de lados igual ao número passado e retorar o menor resultado. e.g. ">advatage 20" vai jogar dois dado com 20 lados.',
+        aliases='desvantagem'
+    )
+    async def disadvantage(self, ctx, number):
+        await ctx.trigger_typing()
+
+        number = abs(int(number))
+
+        print(f'\n [*] \'>d{number}\' command called.')
+
+        await reactToMessage(self.bot, ctx.message, ['❔'])
+
+        output = min(random.randint(1, number), random.randint(1, number))
 
         response = await ctx.reply(output)
 
@@ -68,14 +137,14 @@ class Decisions(commands.Cog):
     # makes a poll
     @commands.command(
         aliases=['votação', 'votar', 'votacao', 'vote', 'enquete'],
-        brief='Auxilia na votação por emojis.', 
+        brief='Auxilia na votação por emojis.',
         help='O self.bot vai enviar uma mensagem convidando as pessoas a adicionarem reações para votarem nas opções especificadas. Ele vai esperar 5 minutos (ou uma quantidade especificada por quem chamou o comando) e depois vai mandar uma mensagem com o resultado da votação.\n\nÉ possível fazer uma votação de no mínimo 2 e no máximo 9 itens por vez, separando-os por " | ".\ne.g.: ">poll estrogonofe | macarrão com calabresa"\n\nExiste também alguns parâmetros/argumentos opcionais que podem ser passados para o comando:\n * Se você quiser que eu marque algum cargo, basta adicionar o parâmetro "$mention=" seguido do nome do cargo a ser marcado;\n * Se quiser que a votação tenha um título, o parâmetro "$title=", seguido do título;\n * Se você quiser que a votação dure N minutos, adicione "$duration=N";\n * Se você quiser que eu também te forneça um relatório com quem votou em cada coisa, inclua "$report".\n\nO nome do cargo a ser marcado deve estar exatamente igual ao nome do cargo no Discord.\nOs parâmetros são opcionais e, se não forem fornecidos (ou se o cargo fornecido não for encontrado), a votação não terá título e nenhum cargo será marcado.\n\nPor exemplo:\n * Se você incluir "$mention=everyone", eu vou marcar @everyone ou "$mention=Moletons", eu vou marcar "@Moletons da Elétrica" ou "@Moletons", respectivamente;\n * Se você incluir "$title=Qual comida vocês preferem para o integra?" essa pergunta será usada como título da votação;\n * Se você incluir "$duration=10", o resultado da votação será apresentado 10 minutos após o seu inícios.\n\ne.g.: ">poll $title=Qual comida vocês preferem para o integra? | $mention=everyone | $duration=15 | $report | Estrogonofe | Macarrão com Calabresa", ">poll Estrogonofe | Macarrão com Calabresa | $title=Qual comida vocês preferem para o integra? | $report | $mention=everyone"\n\nVale ressaltar que cada parâmetro pode ser fornecido apenas uma vez e o valor passado para "duration" deve ser um número.'
     )
     async def poll(self, ctx, *items):
         await ctx.trigger_typing()
 
         print('\n [*] \'>poll\' command called.')
-        
+
         items = list(filter(lambda item: not search('^\s*$', item), ' '.join(items).split(' | ')))
 
         # parses formatting options
@@ -113,41 +182,41 @@ class Decisions(commands.Cog):
 
                 # Sleep time in minutes
                 try: duration = abs(int(items[i].replace('$duration=', '')))
-                except ValueError: 
+                except ValueError:
                     invalid = True
                     break
 
                 removeList.append(items[i])
-                
+
         print(f"   [**] The passed items are: {', '.join(items)}.")
 
         if len(items) > len(AVAILABLE_REACTIONS) or len(items) <= 1 or invalid:
             await reactToMessage(self.bot, ctx.message, ['🙅‍♂️', '❌', '🙅‍♀️'])
-        
+
             response = await ctx.send(('Os parâmetros "mention", "title" e "duration" só podem ser definidos uma vez cada. Além disso, o valor passado para "duration" deve ser um número.') if invalid else (f'É possível votar entre 2 e {len(AVAILABLE_REACTIONS)} opções ao mesmo tempo.') + '\nEnvie `>help poll` para mais informações.')
             await reactToResponse(self.bot, response)
-            
+
             return
-        
+
         else:
             for item in removeList: items.remove(item)
 
         await reactToMessage(self.bot, ctx.message, ['🆗'])
-        
+
         server = ctx.guild
         serverRoles = await server.fetch_roles()
-        
+
         if not duration: duration = 5
-        
-        if mention: 
+
+        if mention:
             mentionText = mention
             mention = server.default_role if mention.lower() == 'everyone' else get(serverRoles, name=mention)
-            
+
             if not mention:
                 response = await ctx.send(f'O cargo `{mentionText}` não existe.')
                 await reactToResponse(self.bot, response)
                 return
-            
+
             elif mentionText.lower() != 'everyone': mention = mention.mention
 
         # Writes message
@@ -156,28 +225,28 @@ class Decisions(commands.Cog):
         for item in items:
             newReaction = random.choice(AVAILABLE_REACTIONS)
             while newReaction in reactions.values(): newReaction = random.choice(AVAILABLE_REACTIONS)
-            
+
             response += f'\n**{item}**: {newReaction}'
             reactions[item] = newReaction
             reactions[newReaction] = item
         response += f'\n\nDaqui a __{duration} minuto{"s" if duration > 1 else ""}__, vou dar o resultado da enquete :)'
-        
+
         response = await ctx.send(response)
 
         await reactToMessage(self.bot, response, reactions.values())
-        
+
         # Sleeps for $duration minutes
         print(f"   [**] This routine will sleep for {duration} minutes while it waits for users to react.")
         await sleep(60 * duration)
         print('\n [*] The \'>poll\' command is done sleeping.')
-        
+
         print(f"   [**] Fetching message reactions.")
         cached = await ctx.fetch_message(response.id)
         print(f"   [**] Fetched message's id: {cached.id}")
 
         # Adds roles to users who reacted
         await ctx.trigger_typing()
-        
+
         result = []
         for reaction in cached.reactions:
             if not reaction.emoji in reactions.values(): continue
@@ -190,7 +259,7 @@ class Decisions(commands.Cog):
                 "item": reactions[reaction.emoji],
                 "reactors": reactors
             })
-            
+
         result.sort(reverse=True, key=lambda item: len(item["reactors"]))
         winners = list(filter(lambda item: len(item["reactors"]) == len(result[0]["reactors"]), result))
         winnerReactions = [item["emoji"] for item in winners]

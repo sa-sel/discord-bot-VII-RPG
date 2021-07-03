@@ -13,7 +13,7 @@ from util import *
 
 # mongo database
 client = pymongo.MongoClient(MONGODB_ATLAS_URI)
-db = client['discord-bot']['discord-bot']
+db = client['discord-bot-vii-rpg']['discord-bot-vii-rpg']
 
 # Manage members permission
 intents = discord.Intents.default()
@@ -54,13 +54,6 @@ async def on_member_join(member):
 
     # If there are any roles to be added, add them to the member that just joined
     if roles: await member.add_roles(roles if len(roles) > 1 else roles[0])
-
-    # Sends a welcome message at the WELCOME_CHANNEL
-    channel = get(member.guild.text_channels, name=WELCOME_CHANNEL)
-    response = await channel.send(f'{member.mention} Seja bem vindo(a), meu {random.choice(VOCATIVES)}!')
-    print("   [**] The welcome message was successfully sent.")
-
-    await reactToResponse(bot, response)
 
 # Whenever a new message is sent to a channel the bot has access to
 @bot.event

@@ -1,8 +1,10 @@
 import pymongo
 from discord.ext import commands
 from discord.utils import get
-from util import *
+
 from config import MONGODB_ATLAS_URI
+from util import *
+
 
 class Counters(commands.Cog):
     def __init__(self, bot):
@@ -10,7 +12,7 @@ class Counters(commands.Cog):
 
         # Database
         client = pymongo.MongoClient(MONGODB_ATLAS_URI)
-        self.db = client['discord-bot']['discord-bot']
+        self.db = client['discord-bot-vii-rpg']['discord-bot-vii-rpg']
         self.counters = self.db.find_one({"description": "counters"})['counters']
 
     # example of a command that uses a counter that increses each time it is called
