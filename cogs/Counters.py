@@ -26,7 +26,7 @@ class Counters(commands.Cog):
 
         response = await ctx.reply(f'Você tirou mais um Natural 1? Caramba... Agora você está com `{user["nat1"]}`.')
 
-        await reactToResponse(self.bot, response, [':one:'])
+        await reactToResponse(self.bot, response, ['1️⃣'])
 
     @commands.command(brief='Adiciona mais um Natural 20 na sua contagem.', help='', aliases=['addnat20', 'add20'])
     async def addNat20(self, ctx):
@@ -40,7 +40,7 @@ class Counters(commands.Cog):
 
         response = await ctx.reply(f'Você tirou mais um Natural 20? Uau... Agora você está com `{user["nat20"]}`.')
 
-        await reactToResponse(self.bot, response, [':two:', ':zero:'])
+        await reactToResponse(self.bot, response, ['2️⃣️⃣', '0️⃣'])
 
     @commands.command(brief='Fala quantos Natural 1s você tirou.', help='', aliases=['natural1', 'nat1s', 'natural1s'])
     async def nat1(self, ctx):
@@ -54,7 +54,7 @@ class Counters(commands.Cog):
 
         response = await ctx.reply(f'Você está com `{user["nat1"]}` Natural 1s.')
 
-        await reactToResponse(self.bot, response, [':one:'])
+        await reactToResponse(self.bot, response, ['1️⃣'])
 
     @commands.command(brief='Fala quantos Natural 20s você tirou.', help='', aliases=['natural20', 'nat20s', 'natural20s'])
     async def nat20(self, ctx):
@@ -68,7 +68,7 @@ class Counters(commands.Cog):
 
         response = await ctx.reply(f'Você está com `{user["nat20"]}` Natural 20s.')
 
-        await reactToResponse(self.bot, response, [':one:'])
+        await reactToResponse(self.bot, response, ['1️⃣'])
 
     @commands.command(brief='Mostra o ranking de Natural 1s e 20s.', help='', aliases=[])
     async def ranking(self, ctx):
@@ -94,7 +94,7 @@ class Counters(commands.Cog):
         response = await ctx.send(f'As pessoas que tiraram mais Natural 20s foram:\n\n{nat20s}')
         response = await ctx.send(f'As pessoas que tiraram mais Natural 1s foram:\n\n{nat1s}')
 
-        await reactToResponse(self.bot, response, [':trophy:'])
+        await reactToResponse(self.bot, response, ['🏆'])
 
 
 def setup(bot):

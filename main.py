@@ -42,6 +42,7 @@ async def on_ready():
     print("\n [*] The bot's status was successfully set.")
 
     periodicRefresh.start()
+    handleRoles.start()
     print("\n [*] The periodic refresh task was successfully started.")
 
 # Whenever a member joins the server
@@ -172,42 +173,46 @@ async def periodicRefresh():
     print("   [**] The commands and triggers were successfully updated", end="")
     print(" - none registered.") if isEmpty else print(".")
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=5)
 async def handleRoles():
-    now = datetime.now(timezone('America/Sao_Paulo'))
-    if now.hour >= 15: return
-
     print("\n [*] Checking roles...")
 
-    role_names = [ f'Mesa {i}' for i in range(1,9) ]
+    now = datetime.now(timezone('America/Sao_Paulo'))
+    if now.hour >= 15:
+        print("   [**] It's after 3PM, so no.")
+        return
 
     reactions_dict = {
-        ':one:':   1,
-        ':two:':   2,
-        ':three:': 3,
-        ':four:':  4,
-        ':five:':  5,
-        ':six:':   6,
-        ':seven:': 7,
-        ':eight:': 8
+        '1️⃣':    'Mesa 1',
+        '2️⃣':    'Mesa 2',
+        '3️⃣':    'Mesa 3',
+        '4️⃣':    'Mesa 4',
+        '5️⃣':    'Mesa 5',
+        '6️⃣':    'Mesa 6',
+        '7️⃣':    'Mesa 7',
+        '8️⃣':    'Mesa 8'
     }
 
     # fetches discord message and roles
     server = await bot.fetch_guild(DISCORD_SERVER)
-    intructions_channel = server.get_channel(DISCORD_CHANNEL)
+    print(f"   [**] Fetched server {server.name}...")
+
+    intructions_channel = get(await server.fetch_channels(), name='instruções')
+    print(f"   [**] Fetched channel {intructions_channel.name}...")
+
     reactions_message = await intructions_channel.fetch_message(DISCORD_MESSAGE)
-    roles = [ role for role in await server.fetch_roles() if role.name in role_names ]
+    roles = [ role for role in await server.fetch_roles() if role.name in reactions_dict.values() ]
 
     print("   [**] Fetched message...")
 
     reactions = [ reaction for reaction in reactions_message.reactions if reaction.me ]
 
     for reaction in reactions:
-        role = get(roles, name=reactions_dict[reaction.name])
+        role = get(roles, name=reactions_dict[reaction.emoji])
         reactors = [ await server.fetch_member(user.id) for user in await reaction.users().flatten() if not user.bot ]
 
         for user in reactors:
-            previousRole = [ r for r in user.roles if r.name in role_names ]
+            previousRole = [ r for r in user.roles if r.name in reactions_dict.values() ]
             if previousRole:
                 for r in previousRole: await user.remove_roles(r)
             await user.add_roles(role)
