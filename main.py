@@ -20,7 +20,7 @@ intents = discord.Intents.default()
 intents.members = True
 
 # Bot client
-bot = commands.Bot(command_prefix='>', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 # Refreshes the sheets' commands and triggers
 def refreshBot():
@@ -165,58 +165,6 @@ async def clear(ctx):
     deleted = await ctx.channel.purge(after=timestamp, check=filterFunction)
 
     response = await ctx.send(f'`{len(deleted)} mensagens foram excluídas.`', delete_after=20)
-
-    await reactToResponse(bot, response)
-
-# Sends a passed message to the specified channel
-@bot.command(
-    brief='Manda uma mensagem no canal escolhido.',
-    help='Sintaxe: >send "$MENSAGEM" @ "$CANAL"\n\nEsse comando vai enviar a $MENSAGEM no $CANAL, em que $CANAL pode ser tanto o nome do canal desejado quanto sua mention.\n\nPor exemplo, o comando a seguir vai enviar "Oi! Tudo bem?" no canal "random":\n>send "Oi! Tudo bem?" @ "random".\n\nOBS: Tanto a mensagem quanto o canal desejado devem estar entre aspas e deve haver exatamente um espaço entre cada bloco do comando (mensagem, @ e canal). Caso você queira que sua mensagem contenha uma arroba, escreva dentro dela \\@.\n\n(esse comando foi feito especialmente para o Júlio <3)',
-    aliases=[]
-)
-async def send(ctx, *argv):
-    await ctx.trigger_typing()
-
-    print('\n [*] \'>send\' command called.')
-    await reactToMessage(bot, ctx.message, ['🆗', '📢'])
-
-    argv = " ".join(argv)
-    argv = argv.split(' @ ')
-
-    # checks if arguments are valid
-    if len(argv) != 2 or not search('[^"]', argv[0]) or not search('[^"]', argv[1]):
-        response = 'Os argumentos passados são inválidos. Para mais informações, envie ">help send".'
-
-    else:
-        message = sub('^"(.+)"$', r'\g<1>', argv[0]).replace('\\@', '@')
-        channelRef = sub('^"(.+)"$', r'\g<1>', argv[1]).replace('\\@', '@')
-
-        channel = get(ctx.guild.text_channels, name=channelRef) or get(ctx.guild.text_channels, mention=channelRef)
-
-        # if the channel exists
-        if channel:
-            permissionsUser= channel.permissions_for(ctx.author)
-            permissionMe = channel.permissions_for(ctx.guild.me)
-
-            # checks permissions
-            if not permissionMe.send_messages or not permissionsUser.read_messages:
-                response = f'Infelizmente eu não tenho permissão para mandar/visualizar mensagens no {channel.mention}... *O que será que eles têm a esconder, hein?!*'
-
-            # if all permissions are ok
-            elif permissionsUser.send_messages and permissionsUser.read_messages:
-                message = await channel.send(message)
-                await reactToMessage(bot, message, ['🤠', '📢'])
-
-                response = f'A mensagem foi enviada com sucesso no {channel.mention}.'
-
-            else:
-                response = f'Infelizmente você não tem permissão para mandar mensagens {channel.mention}'
-
-        # if the channel does not exist
-        else:
-            response = f'Infelizmente o canal passado (`{channelRef}`) não foi encontrado.'
-
-    response = await ctx.reply(response)
 
     await reactToResponse(bot, response)
 
