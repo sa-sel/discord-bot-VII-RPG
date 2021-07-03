@@ -1,10 +1,5 @@
-import random
-from asyncio import sleep
-from re import search
-
 import pymongo
 from discord.ext import commands
-from discord.utils import get
 
 from config import *
 from config import MONGODB_ATLAS_URI

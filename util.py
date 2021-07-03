@@ -3,7 +3,6 @@ import re
 from functools import reduce
 
 import requests
-from bs4 import BeautifulSoup
 
 # constants
 WELCOME_CHANNEL = 'random' # channel in which to send welcome message for new members
@@ -179,10 +178,10 @@ def user_dice_counter(db, id, incNat1: bool = False, incNat20: bool = False):
     if incNat1: user["nat1"] += 1
     if incNat20: user["nat20"] += 1
 
-    db.find_one_and_update({ "discord_id": user.discord_id },
+    db.find_one_and_update({ "discord_id": user["discord_id"] },
                            { "$set": {
-                               "nat1": user.nat1,
-                               "nat20": user.nat20
+                               "nat1": user["nat1"],
+                               "nat20": user["nat20"]
                            } })
 
     return user
