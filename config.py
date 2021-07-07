@@ -65,6 +65,9 @@ if not os.path.isfile('./credentials.json'):
     with open('./credentials.json', 'w') as f:
         dump(credentials, f, indent=4)
 
+# creates image directory if it does not exists
+if not os.path.isdir('./images'): os.mkdir('./images')
+
 # Use creds to create a client to interact with the Google Drive API
 scope = [
     "https://spreadsheets.google.com/feeds",
