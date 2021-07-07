@@ -193,6 +193,8 @@ async def handleRoles():
         '8️⃣':    'Mesa 8'
     }
 
+    MAX_MEMBERS = 5
+
     # fetches discord message and roles
     server = await bot.fetch_guild(DISCORD_SERVER)
     print(f"   [**] Fetched server {server.name}...")
@@ -201,21 +203,35 @@ async def handleRoles():
     print(f"   [**] Fetched channel {intructions_channel.name}...")
 
     reactions_message = await intructions_channel.fetch_message(DISCORD_MESSAGE)
-    roles = [ role for role in await server.fetch_roles() if role.name in reactions_dict.values() ]
 
     print("   [**] Fetched message...")
 
     reactions = [ reaction for reaction in reactions_message.reactions if reaction.me ]
 
     for reaction in reactions:
-        role = get(roles, name=reactions_dict[reaction.emoji])
-        reactors = [ await server.fetch_member(user.id) for user in await reaction.users().flatten() if not user.bot ]
+        reactors = [
+            await server.fetch_member(user.id)
+            for user in await reaction.users().flatten()
+            if not user.bot
+        ]
+
+        role = get(await server.fetch_roles(), name=reactions_dict[reaction.emoji])
+        no_members = len(role.members)
 
         for user in reactors:
-            previousRole = [ r for r in user.roles if r.name in reactions_dict.values() ]
-            if previousRole:
-                for r in previousRole: await user.remove_roles(r)
-            await user.add_roles(role)
+            if get(user.roles, name=role.name): continue
+
+            elif no_members >= MAX_MEMBERS:
+                response = await user.send(f'**[VII RPG DA SA-SEL]**\n\nInfelizmente a {role.name} está cheia e eu não consigo te inserir nela. Em caso de dúvidas, fale com a equipe do evento.')
+                await reactToResponse(bot, response)
+
+            else:
+                previousRole = [ r for r in user.roles if r.name in reactions_dict.values() ]
+                if previousRole:
+                    for r in previousRole: await user.remove_roles(r)
+
+                await user.add_roles(role)
+                no_members += 1
 
     print("   [**] Managed roles...")
 
